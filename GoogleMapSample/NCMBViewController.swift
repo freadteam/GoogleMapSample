@@ -53,7 +53,7 @@ class NCMBViewController: UIViewController {
         }
     }
     
-    //マーカーを打ち込む　方法①
+    //マーカーを打ち込む　方法①（マップ長押しから生成）
     func showMaker(position: CLLocationCoordinate2D) {
         let alert = UIAlertController(title: "場所", message: "場所名を記入して", preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: "キャンセル", style: .default) { (action) in
@@ -62,7 +62,7 @@ class NCMBViewController: UIViewController {
         //okした時の処理
         let okAction = UIAlertAction(title: "OK", style: .default) { (action) in
             
-            //ピンを生成
+            //マーカーを生成
             let marker = GMSMarker()
             marker.position = position
             marker.title = alert.textFields?.first?.text
@@ -70,9 +70,12 @@ class NCMBViewController: UIViewController {
             //場所名が記入された時のみマーカーを生成
             if alert.textFields?.first?.text?.count != 0 {
                 marker.map = self.mapView
+                
                 //NCMBの保存
                 self.saveMarker(latitude: position.latitude, longitude: position.longitude, title: marker.title!)
             }
+            
+            
             alert.dismiss(animated: true, completion: nil)
         }
         alert.addAction(cancelAction)
@@ -81,10 +84,9 @@ class NCMBViewController: UIViewController {
             textField.placeholder = "場所名を記入"
         }
         self.present(alert, animated: true, completion: nil)
-        
     }
     
-    //マーカを打ち込む　方法②（アラート出さずに生成）
+    //マーカを打ち込む　方法②（アラート出さずに生成）、検索から生成に使用（NCMBに保存されない）
     func makeMarker(latitude: CLLocationDegrees, longitude: CLLocationDegrees, title: String) {
         let marker = GMSMarker()
         marker.position.latitude = latitude
@@ -93,6 +95,18 @@ class NCMBViewController: UIViewController {
         //マーカを地図に表示
         marker.map = mapView
       
+    }
+    
+     //マーカを打ち込む　方法③ NCMBから引っ張ってくる（各objectIdをmarker.accessibilityHintに保存して識別）
+    func makeNCMBMarker(latitude: CLLocationDegrees, longitude: CLLocationDegrees, title: String, objectId: String) {
+        let marker = GMSMarker()
+        marker.position.latitude = latitude
+        marker.position.longitude = longitude
+        marker.title = title
+        marker.accessibilityHint = objectId
+        //マーカを地図に表示
+        marker.map = mapView
+        
     }
     
     //NCMBの保存
@@ -106,9 +120,12 @@ class NCMBViewController: UIViewController {
                // SVProgressHUD.showError(withStatus: error!.localizedDescription)
             } else {
                     print("登録成功")
+                //マーカー打ち込む→データ保存→データ読みこんで表示→objectId取得
+                self.loadMarkerData()
             }
         })
     }
+    
     
     func loadMarkerData() {
         let query = NCMBQuery(className: "Place")
@@ -119,10 +136,12 @@ class NCMBViewController: UIViewController {
             } else {
                 for postObject in result as! [NCMBObject] {
                     // 投稿の情報を取得
+                    let objectId = postObject.object(forKey: "objectId") as! String
                     let latitude = postObject.object(forKey: "latitude") as! CLLocationDegrees
                     let longitude = postObject.object(forKey: "longitude") as! CLLocationDegrees
                     let title = postObject.object(forKey: "title") as! String
-                    self.makeMarker(latitude: latitude, longitude: longitude, title: title)
+                   // self.makeMarker(latitude: latitude, longitude: longitude, title: title)
+                self.makeNCMBMarker(latitude: latitude, longitude: longitude, title: title, objectId: objectId)
                 }
             }
         })
@@ -143,11 +162,6 @@ extension NCMBViewController: GMSMapViewDelegate{
         showMaker(position: coordinate)
     }
     
-    //    //タップした場所の緯度経度をとってくる
-    //    func mapView(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) {
-    //        showMaker(position: coordinate)
-    //    }
-    
     //マーカーのウィンドウを押した時の処理
     func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
         let alertController = UIAlertController(title: "ピンを押したよ", message: "ピンを押したよ", preferredStyle: .alert)
@@ -167,21 +181,21 @@ extension NCMBViewController: GMSMapViewDelegate{
             //マーカー除去
             marker.map = nil
             
-            
-//            let query = NCMBQuery(className: "Place")
-//            query?.getObjectInBackground(withId: 消したいマーカーのobjectId, block: { (post, error) in
-//            if error != nil {
-//                    //SVProgressHUD.showError(withStatus: error!.localizedDescription)
-//                } else {
-//                post?.deleteInBackground({ (erroe) in
-//                    if error != nil {
-//                        //SVProgressHUD.showError(withStatus: error!.localizedDescription)
-//                    } else {
-//                        print("削除成功")
-//                    }
-//                })
-//                }
-//            })
+            //NCMBから削除
+            let query = NCMBQuery(className: "Place")
+            query?.getObjectInBackground(withId: marker.accessibilityHint!, block: { (post, error) in
+            if error != nil {
+                    //SVProgressHUD.showError(withStatus: error!.localizedDescription)
+                } else {
+                post?.deleteInBackground({ (erroe) in
+                    if error != nil {
+                        //SVProgressHUD.showError(withStatus: error!.localizedDescription)
+                    } else {
+                        print("削除成功")
+                    }
+                })
+                }
+            })
         })
         
         

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		144383EB082B641D7C42030A /* Pods_GoogleMapSample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B512F9D79B9B44C788DAB4D /* Pods_GoogleMapSample.framework */; };
 		2C1CD37F209B002900F43910 /* searchResult.png in Resources */ = {isa = PBXBuildFile; fileRef = 2C1CD37E209B002900F43910 /* searchResult.png */; };
-		2C652163209AE703005D1294 /* Marker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C652162209AE703005D1294 /* Marker.swift */; };
 		2C652165209AE724005D1294 /* APIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C652164209AE724005D1294 /* APIKey.swift */; };
 		2C6B0A942099DE430088D6DB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6B0A932099DE430088D6DB /* AppDelegate.swift */; };
 		2C6B0A962099DE430088D6DB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6B0A952099DE430088D6DB /* ViewController.swift */; };
@@ -24,7 +23,6 @@
 /* Begin PBXFileReference section */
 		0B512F9D79B9B44C788DAB4D /* Pods_GoogleMapSample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GoogleMapSample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C1CD37E209B002900F43910 /* searchResult.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = searchResult.png; sourceTree = "<group>"; };
-		2C652162209AE703005D1294 /* Marker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Marker.swift; sourceTree = "<group>"; };
 		2C652164209AE724005D1294 /* APIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKey.swift; sourceTree = "<group>"; };
 		2C6B0A902099DE430088D6DB /* GoogleMapSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GoogleMapSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C6B0A932099DE430088D6DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -76,7 +74,6 @@
 			children = (
 				2C1CD37E209B002900F43910 /* searchResult.png */,
 				2CDABAB8209AA6220000E06E /* search@2x.png */,
-				2C652162209AE703005D1294 /* Marker.swift */,
 				2C652164209AE724005D1294 /* APIKey.swift */,
 				2C6B0A932099DE430088D6DB /* AppDelegate.swift */,
 				2C6B0A952099DE430088D6DB /* ViewController.swift */,
@@ -247,7 +244,6 @@
 				2C6B0A962099DE430088D6DB /* ViewController.swift in Sources */,
 				2CDD5C832099EBB300124AA5 /* NCMBViewController.swift in Sources */,
 				2C6B0A942099DE430088D6DB /* AppDelegate.swift in Sources */,
-				2C652163209AE703005D1294 /* Marker.swift in Sources */,
 				2C652165209AE724005D1294 /* APIKey.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
