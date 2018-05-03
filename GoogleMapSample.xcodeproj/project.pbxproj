@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		144383EB082B641D7C42030A /* Pods_GoogleMapSample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B512F9D79B9B44C788DAB4D /* Pods_GoogleMapSample.framework */; };
+		2C1CD37F209B002900F43910 /* searchResult.png in Resources */ = {isa = PBXBuildFile; fileRef = 2C1CD37E209B002900F43910 /* searchResult.png */; };
+		2C652163209AE703005D1294 /* Marker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C652162209AE703005D1294 /* Marker.swift */; };
+		2C652165209AE724005D1294 /* APIKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C652164209AE724005D1294 /* APIKey.swift */; };
 		2C6B0A942099DE430088D6DB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6B0A932099DE430088D6DB /* AppDelegate.swift */; };
 		2C6B0A962099DE430088D6DB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6B0A952099DE430088D6DB /* ViewController.swift */; };
 		2C6B0A992099DE430088D6DB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2C6B0A972099DE430088D6DB /* Main.storyboard */; };
@@ -16,11 +19,13 @@
 		2C6B0AA72099DE530088D6DB /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C6B0AA62099DE530088D6DB /* CoreLocation.framework */; };
 		2CDABAB9209AA6220000E06E /* search@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2CDABAB8209AA6220000E06E /* search@2x.png */; };
 		2CDD5C832099EBB300124AA5 /* NCMBViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CDD5C822099EBB300124AA5 /* NCMBViewController.swift */; };
-		2CFC81B82099E894002EA304 /* Pin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CFC81B72099E894002EA304 /* Pin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0B512F9D79B9B44C788DAB4D /* Pods_GoogleMapSample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GoogleMapSample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2C1CD37E209B002900F43910 /* searchResult.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = searchResult.png; sourceTree = "<group>"; };
+		2C652162209AE703005D1294 /* Marker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Marker.swift; sourceTree = "<group>"; };
+		2C652164209AE724005D1294 /* APIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKey.swift; sourceTree = "<group>"; };
 		2C6B0A902099DE430088D6DB /* GoogleMapSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GoogleMapSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C6B0A932099DE430088D6DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2C6B0A952099DE430088D6DB /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -31,7 +36,6 @@
 		2C6B0AA62099DE530088D6DB /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		2CDABAB8209AA6220000E06E /* search@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "search@2x.png"; sourceTree = "<group>"; };
 		2CDD5C822099EBB300124AA5 /* NCMBViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NCMBViewController.swift; sourceTree = "<group>"; };
-		2CFC81B72099E894002EA304 /* Pin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pin.swift; sourceTree = "<group>"; };
 		7D7A7D98C8422ACB8F71E07F /* Pods-GoogleMapSample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoogleMapSample.release.xcconfig"; path = "Pods/Target Support Files/Pods-GoogleMapSample/Pods-GoogleMapSample.release.xcconfig"; sourceTree = "<group>"; };
 		B7D49D9DEEC6322C202434A7 /* Pods-GoogleMapSample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoogleMapSample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-GoogleMapSample/Pods-GoogleMapSample.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -70,9 +74,11 @@
 		2C6B0A922099DE430088D6DB /* GoogleMapSample */ = {
 			isa = PBXGroup;
 			children = (
+				2C1CD37E209B002900F43910 /* searchResult.png */,
 				2CDABAB8209AA6220000E06E /* search@2x.png */,
+				2C652162209AE703005D1294 /* Marker.swift */,
+				2C652164209AE724005D1294 /* APIKey.swift */,
 				2C6B0A932099DE430088D6DB /* AppDelegate.swift */,
-				2CFC81B72099E894002EA304 /* Pin.swift */,
 				2C6B0A952099DE430088D6DB /* ViewController.swift */,
 				2CDD5C822099EBB300124AA5 /* NCMBViewController.swift */,
 				2C6B0A972099DE430088D6DB /* Main.storyboard */,
@@ -164,6 +170,7 @@
 			files = (
 				2C6B0A9E2099DE440088D6DB /* LaunchScreen.storyboard in Resources */,
 				2C6B0A9B2099DE440088D6DB /* Assets.xcassets in Resources */,
+				2C1CD37F209B002900F43910 /* searchResult.png in Resources */,
 				2C6B0A992099DE430088D6DB /* Main.storyboard in Resources */,
 				2CDABAB9209AA6220000E06E /* search@2x.png in Resources */,
 			);
@@ -237,10 +244,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2CFC81B82099E894002EA304 /* Pin.swift in Sources */,
 				2C6B0A962099DE430088D6DB /* ViewController.swift in Sources */,
 				2CDD5C832099EBB300124AA5 /* NCMBViewController.swift in Sources */,
 				2C6B0A942099DE430088D6DB /* AppDelegate.swift in Sources */,
+				2C652163209AE703005D1294 /* Marker.swift in Sources */,
+				2C652165209AE724005D1294 /* APIKey.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

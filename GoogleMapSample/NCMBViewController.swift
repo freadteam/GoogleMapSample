@@ -3,19 +3,19 @@
 import UIKit
 import CoreLocation
 import GoogleMaps
+import GooglePlaces
 import NCMB
 
-class NCMBViewController: UIViewController, GMSMapViewDelegate {
-    
+class NCMBViewController: UIViewController {
+
     //mapViewを表示させる
     @IBOutlet var mapView: GMSMapView!
-    //位置情報で使う
+    //位置情報の使用
     var locationManager = CLLocationManager()
-    var pins = [Pin]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        //GMSMapViewDelegate(extensionに記載)
         mapView.delegate = self
         //位置情報使用の許可
         locationManager.requestWhenInUseAuthorization()
@@ -25,20 +25,11 @@ class NCMBViewController: UIViewController, GMSMapViewDelegate {
         mapView.settings.myLocationButton = true
         
         makeMap()
-        
+        makeSearchButton()
     }
     
-    
     override func viewWillAppear(_ animated: Bool) {
-        loadPlace()
-        for i in pins {
-            let marker = GMSMarker()
-            marker.position.latitude = i.latitude
-            marker.position.longitude = i.longitude
-            //マーカを地図に表示
-            marker.map = mapView
-            print(pins)
-        }
+        loadMarkerData()
     }
     
     override func didReceiveMemoryWarning() {
@@ -50,11 +41,9 @@ class NCMBViewController: UIViewController, GMSMapViewDelegate {
         // 現在地の緯度経度
         let latitude = locationManager.location?.coordinate.latitude
         let longitude = locationManager.location?.coordinate.longitude
-        
-        
         //表示する時の中心となる場所を指定する（nilに注意）
         if let unwrappedLatitude = latitude {
-            //位置情報の使用を許可されたとき
+            //位置情報の使用を許可されてる時（現在地を中心に表示）
             let camera = GMSCameraPosition.camera(withLatitude: unwrappedLatitude, longitude: longitude!, zoom: 15.0)
             mapView.camera = camera
         } else {
@@ -66,62 +55,136 @@ class NCMBViewController: UIViewController, GMSMapViewDelegate {
     
     //マーカーを打ち込む　方法①
     func showMaker(position: CLLocationCoordinate2D) {
-        
-        let marker = GMSMarker()
-        marker.position = position
-        
-        //marker.title = "title"
-        //marker.snippet = "test"
-        marker.map = mapView
+        let alert = UIAlertController(title: "場所", message: "場所名を記入して", preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "キャンセル", style: .default) { (action) in
+            alert.dismiss(animated: true, completion: nil)
+        }
+        //okした時の処理
+        let okAction = UIAlertAction(title: "OK", style: .default) { (action) in
+            
+            //ピンを生成
+            let marker = GMSMarker()
+            marker.position = position
+            marker.title = alert.textFields?.first?.text
+            //marker.snippet = ""
+            //場所名が記入された時のみマーカーを生成
+            if alert.textFields?.first?.text?.count != 0 {
+                marker.map = self.mapView
+                //NCMBの保存
+                self.saveMarker(latitude: position.latitude, longitude: position.longitude, title: marker.title!)
+            }
+            alert.dismiss(animated: true, completion: nil)
+        }
+        alert.addAction(cancelAction)
+        alert.addAction(okAction)
+        alert.addTextField { (textField) in
+            textField.placeholder = "場所名を記入"
+        }
+        self.present(alert, animated: true, completion: nil)
         
     }
     
-    //マーカを打ち込む　方法②
-    //    func makeMarker(latitude: CLLocationDegrees, longitude: CLLocationDegrees) {
-    //        let marker = GMSMarker()
-    //        marker.position.latitude = latitude
-    //        marker.position.longitude = longitude
-    //       //マーカを地図に表示
-    //        marker.map = mapView
-    //    }
+    //マーカを打ち込む　方法②（アラート出さずに生成）
+    func makeMarker(latitude: CLLocationDegrees, longitude: CLLocationDegrees, title: String) {
+        let marker = GMSMarker()
+        marker.position.latitude = latitude
+        marker.position.longitude = longitude
+        marker.title = title
+        //マーカを地図に表示
+        marker.map = mapView
+      
+    }
     
+    //NCMBの保存
+    func saveMarker(latitude: CLLocationDegrees, longitude: CLLocationDegrees, title: String) {
+        let object = NCMBObject(className: "Place")
+        object?.setObject(latitude, forKey: "latitude")
+        object?.setObject(longitude, forKey: "longitude")
+        object?.setObject(title, forKey: "title")
+        object?.saveInBackground({ (error) in
+            if error != nil {
+               // SVProgressHUD.showError(withStatus: error!.localizedDescription)
+            } else {
+                    print("登録成功")
+            }
+        })
+    }
+    
+    func loadMarkerData() {
+        let query = NCMBQuery(className: "Place")
+        // オブジェクトの取得
+        query?.findObjectsInBackground({ (result, error) in
+            if error != nil {
+                // SVProgressHUD.showError(withStatus: error!.localizedDescription)
+            } else {
+                for postObject in result as! [NCMBObject] {
+                    // 投稿の情報を取得
+                    let latitude = postObject.object(forKey: "latitude") as! CLLocationDegrees
+                    let longitude = postObject.object(forKey: "longitude") as! CLLocationDegrees
+                    let title = postObject.object(forKey: "title") as! String
+                    self.makeMarker(latitude: latitude, longitude: longitude, title: title)
+                }
+            }
+        })
+    }
+
+
+    
+    
+    
+}
+
+
+//viewDidLoadでdelegateの宣言をしておく
+extension NCMBViewController: GMSMapViewDelegate{
     
     //長押しした場所の緯度経度をとってくる
     func mapView(_ mapView: GMSMapView, didLongPressAt coordinate: CLLocationCoordinate2D) {
         showMaker(position: coordinate)
-        saveLocation(coordinate: coordinate)
-        
-    
-
-        
     }
     
-    //タップした場所の緯度経度をとってくる
+    //    //タップした場所の緯度経度をとってくる
     //    func mapView(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) {
-    //        print(coordinate)
     //        showMaker(position: coordinate)
     //    }
     
-    //ピンを押した時の処理
+    //マーカーのウィンドウを押した時の処理
     func mapView(_ mapView: GMSMapView, didTapInfoWindowOf marker: GMSMarker) {
         let alertController = UIAlertController(title: "ピンを押したよ", message: "ピンを押したよ", preferredStyle: .alert)
         let action = UIAlertAction(title: "OK", style: .default, handler: { (action) in
-            self.navigationController?.popViewController(animated: true)
+            alertController.dismiss(animated: true, completion: nil)
         })
         alertController.addAction(action)
         self.present(alertController, animated: true, completion: nil)
     }
     
-    
-    
-    //ピンを長押した時の処理
+    //マーカーのウィンドウを長押した時の処理
     func mapView(_ mapView: GMSMapView, didLongPressInfoWindowOf marker: GMSMarker) {
         
         let alert = UIAlertController(title: "ピンの削除", message: "ピンを削除しますか？", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default, handler: { (action) in
-            //ピンを除去
+            
+            //マーカー除去
             marker.map = nil
+            
+            
+//            let query = NCMBQuery(className: "Place")
+//            query?.getObjectInBackground(withId: 消したいマーカーのobjectId, block: { (post, error) in
+//            if error != nil {
+//                    //SVProgressHUD.showError(withStatus: error!.localizedDescription)
+//                } else {
+//                post?.deleteInBackground({ (erroe) in
+//                    if error != nil {
+//                        //SVProgressHUD.showError(withStatus: error!.localizedDescription)
+//                    } else {
+//                        print("削除成功")
+//                    }
+//                })
+//                }
+//            })
         })
+        
+        
         let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel, handler: { (action) in
             alert.dismiss(animated: true, completion: nil)
         })
@@ -131,74 +194,98 @@ class NCMBViewController: UIViewController, GMSMapViewDelegate {
         
     }
     
+    //デフォルトで地図に表示されている場所をタップすると情報を取得
+    func mapView(_ mapView:GMSMapView, didTapPOIWithPlaceID placeID:String,
+                 name:String, location:CLLocationCoordinate2D) {
+        print("You tapped \(name): \(placeID), \(location.latitude)/\(location.longitude)")
+    }
+    
     //ピンを押した時に表示される情報ウィンドウを細かく設定できる
-    func mapView(_ mapView: GMSMapView, markerInfoWindow marker: GMSMarker) -> UIView? {
-        let view = UIView(frame: CGRect.init(x: 0, y: 0, width: 200, height: 70))
-        //ウィンドウの色
-        view.backgroundColor = UIColor.red
-        view.layer.cornerRadius = 6
+    //    func mapView(_ mapView: GMSMapView, markerInfoWindow marker: GMSMarker) -> UIView? {
+    //
+    //        let view = UIView(frame: CGRect.init(x: 0, y: 0, width: 200, height: 70))
+    //
+    //        //ウィンドウの色
+    //        view.backgroundColor = UIColor.red
+    //        view.layer.cornerRadius = 6
+    //
+    //        let lbl1 = UILabel(frame: CGRect.init(x: 8, y: 8, width: view.frame.size.width - 16, height: 15))
+    //        lbl1.text = "場所名"
+    //        view.addSubview(lbl1)
+    //
+    //        let lbl2 = UILabel(frame: CGRect.init(x: lbl1.frame.origin.x, y: lbl1.frame.origin.y + lbl1.frame.size.height + 3, width: view.frame.size.width - 16, height: 15))
+    //        lbl2.text = "説明を記入"
+    //        lbl2.font = UIFont.systemFont(ofSize: 14, weight: .light)
+    //        view.addSubview(lbl2)
+    //
+    //        return view
+    //    }
+}
+
+// GooglePlace
+extension NCMBViewController: GMSAutocompleteViewControllerDelegate {
+    
+    // 検索して選択した場所の情報を取得
+    func viewController(_ viewController: GMSAutocompleteViewController, didAutocompleteWith place: GMSPlace) {
+        //        print("Place name: \(place.name)")
+        //        print("Place address: \(place.formattedAddress)")
+        //        print("Place attributions: \(place.attributions)")
         
-        let lbl1 = UILabel(frame: CGRect.init(x: 8, y: 8, width: view.frame.size.width - 16, height: 15))
+        let camera = GMSCameraPosition.camera(withLatitude: place.coordinate.latitude, longitude: place.coordinate.longitude, zoom: 15.0)
+        mapView.camera = camera
         
-        lbl1.text = "Hi there!"
-        view.addSubview(lbl1)
+        //saveMarker(latitude: place.coordinate.latitude, longitude: place.coordinate.longitude, title: place.name)
+        makeMarker(latitude:  place.coordinate.latitude, longitude: place.coordinate.longitude, title: place.name)
         
-        let lbl2 = UILabel(frame: CGRect.init(x: lbl1.frame.origin.x, y: lbl1.frame.origin.y + lbl1.frame.size.height + 3, width: view.frame.size.width - 16, height: 15))
-        lbl2.text = "I am a custom info window."
-        lbl2.font = UIFont.systemFont(ofSize: 14, weight: .light)
-        view.addSubview(lbl2)
         
-        return view
+        dismiss(animated: true, completion: nil)
+    }
+    //取得できなかった時に呼ばれる
+    func viewController(_ viewController: GMSAutocompleteViewController, didFailAutocompleteWithError error: Error) {
+        // TODO: handle the error.
+        print("Error: ", error.localizedDescription)
     }
     
-    //ピンの緯度経度を保存
-    func saveLocation(coordinate: CLLocationCoordinate2D) {
-        let object = NCMBObject(className: "Place")
-        object?.setObject(coordinate.latitude, forKey: "latitude")
-        object?.setObject(coordinate.longitude, forKey: "longitude")
-        object?.saveInBackground({ (error) in
-            if error != nil {
-               
-            } else {
-                print("保存完了")
-            }
-        })
+    //キャンセルボタンのアクション
+    func wasCancelled(_ viewController: GMSAutocompleteViewController) {
+        dismiss(animated: true, completion: nil)
     }
     
-    //保存したピンの情報を読み込む
-    func loadPlace() {
-        let query = NCMBQuery(className: "Place")
-        // オブジェクトの取得
-        query?.findObjectsInBackground({ (result, error) in
-            if error != nil {
-                
-            } else {
-                // 投稿を格納しておく配列を初期化(これをしないとreload時にappendで二重に追加されてしまう)
-                self.pins = [Pin]()
-                
-                for postObject in result as! [NCMBObject] {
-                    // 投稿の情報を取得
-                    let latitude = postObject.object(forKey: "latitude") as! CLLocationDegrees
-                    let longitude = postObject.object(forKey: "longitude") as! CLLocationDegrees
-                    let pin = Pin(objectId: postObject.objectId, latitude: latitude, longitude: longitude)
-                    
-                    let title = postObject.object(forKey: "title")
-                    let text = postObject.object(forKey: "text")
-                    
-                    if let titiles = title {
-                        pin.title = titiles as? String
-                    }
-                    if let texts = text {
-                        pin.text = texts as? String
-                    }
-                    
-                    self.pins.append(pin)
-                }
-            }
-        })
+    //Turn the network activity indicator on and off again.
+    func didRequestAutocompletePredictions(_ viewController: GMSAutocompleteViewController) {
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
+    }
+    
+    func didUpdateAutocompletePredictions(_ viewController: GMSAutocompleteViewController) {
+        UIApplication.shared.isNetworkActivityIndicatorVisible = false
+    }
+    
+    //検索画面を表示させるボタン
+    func makeSearchButton() {
+        let button = UIButton()
+        button.frame = CGRect(x: 0, y: 0, width: 55, height: 55)
+        button.backgroundColor = UIColor.white
+        button.setImage(UIImage(named: "search@2x.png"), for: .normal)
+        button.layer.masksToBounds = true
+        button.layer.cornerRadius = button.frame.height/2
+        button.layer.position = CGPoint(x: 340, y: 50)
+        self.mapView.addSubview(button)
         
+        //ボタンに影をつける　なんかできない
+        button.layer.shadowOffset = CGSize(width: 55, height: 55 )
+        button.layer.shadowColor = UIColor.gray.cgColor
+        button.layer.shadowRadius = button.frame.height/2
+        button.layer.shadowOpacity = 1.0
+        
+        //ボタンで実行する処理
+        button.addTarget(self, action: #selector(NCMBViewController.buttonEvent(_:)), for: UIControlEvents.touchUpInside)
     }
     
-    
+    // ボタンが押された時に呼ばれるメソッド（検索ウィンドウを表示させる）
+    @objc func buttonEvent(_ sender: UIButton) {
+        let autocompleteController = GMSAutocompleteViewController()
+        autocompleteController.delegate = self
+        present(autocompleteController, animated: true, completion: nil)
+    }
     
 }

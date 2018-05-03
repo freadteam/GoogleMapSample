@@ -1,19 +1,26 @@
+/*
+ ・地図の生成
+ ・現在地の取得
+ ・マーカーを任意の場所に生成
+ ・マーカーをタップすると詳細を表示
+ ・マーカーの削除
+ ・場所の検索
+ */
 import UIKit
 import CoreLocation
 import GoogleMaps
 import GooglePlaces
+//import GooglePlacePicker
 
 class ViewController: UIViewController {
     
     //mapViewを表示させる
     @IBOutlet var mapView: GMSMapView!
-    
     //位置情報の使用
     var locationManager = CLLocationManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         //GMSMapViewDelegate(extensionに記載)
         mapView.delegate = self
         //位置情報使用の許可
@@ -157,20 +164,20 @@ extension ViewController: GMSMapViewDelegate{
     //    }
 }
 
-// GooglePlace
+// GooglePlace（検索＋オートコンプリート）
 extension ViewController: GMSAutocompleteViewControllerDelegate {
-    
+
     // 検索して選択した場所の情報を取得
     func viewController(_ viewController: GMSAutocompleteViewController, didAutocompleteWith place: GMSPlace) {
         //        print("Place name: \(place.name)")
         //        print("Place address: \(place.formattedAddress)")
         //        print("Place attributions: \(place.attributions)")
-        
+
         let camera = GMSCameraPosition.camera(withLatitude: place.coordinate.latitude, longitude: place.coordinate.longitude, zoom: 15.0)
         mapView.camera = camera
-        
+
         makeMarker(latitude:  place.coordinate.latitude, longitude: place.coordinate.longitude, title: place.name)
-        
+
         dismiss(animated: true, completion: nil)
     }
     //取得できなかった時に呼ばれる
@@ -178,12 +185,12 @@ extension ViewController: GMSAutocompleteViewControllerDelegate {
         // TODO: handle the error.
         print("Error: ", error.localizedDescription)
     }
-    
+
     //キャンセルボタンのアクション
     func wasCancelled(_ viewController: GMSAutocompleteViewController) {
         dismiss(animated: true, completion: nil)
     }
-    
+
      //Turn the network activity indicator on and off again.
     func didRequestAutocompletePredictions(_ viewController: GMSAutocompleteViewController) {
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
@@ -192,7 +199,7 @@ extension ViewController: GMSAutocompleteViewControllerDelegate {
     func didUpdateAutocompletePredictions(_ viewController: GMSAutocompleteViewController) {
         UIApplication.shared.isNetworkActivityIndicatorVisible = false
     }
-    
+
     //検索画面を表示させるボタン
     func makeSearchButton() {
         let button = UIButton()
@@ -203,24 +210,51 @@ extension ViewController: GMSAutocompleteViewControllerDelegate {
         button.layer.cornerRadius = button.frame.height/2
         button.layer.position = CGPoint(x: 340, y: 50)
         self.mapView.addSubview(button)
-        
+
         //ボタンに影をつける　なんかできない
         button.layer.shadowOffset = CGSize(width: 55, height: 55 )
         button.layer.shadowColor = UIColor.gray.cgColor
         button.layer.shadowRadius = button.frame.height/2
         button.layer.shadowOpacity = 1.0
-        
+
         //ボタンで実行する処理
         button.addTarget(self, action: #selector(ViewController.buttonEvent(_:)), for: UIControlEvents.touchUpInside)
     }
-    
+
     // ボタンが押された時に呼ばれるメソッド（検索ウィンドウを表示させる）
     @objc func buttonEvent(_ sender: UIButton) {
         let autocompleteController = GMSAutocompleteViewController()
         autocompleteController.delegate = self
         present(autocompleteController, animated: true, completion: nil)
     }
-    
+
 }
 
-
+//placepicker、検索した場所周辺の情報を表示する
+//extension ViewController: GMSPlacePickerViewControllerDelegate {
+//    // The code snippet below shows how to create and display a GMSPlacePickerViewController.
+//    @IBAction func pickPlace(_ sender: UIButton) {
+//        let config = GMSPlacePickerConfig(viewport: nil)
+//        let placePicker = GMSPlacePickerViewController(config: config)
+//        placePicker.delegate = self
+//        present(placePicker, animated: true, completion: nil)
+//    }
+//
+//    // To receive the results from the place picker 'self' will need to conform to
+//    // GMSPlacePickerViewControllerDelegate and implement this code.
+//    func placePicker(_ viewController: GMSPlacePickerViewController, didPick place: GMSPlace) {
+//        // Dismiss the place picker, as it cannot dismiss itself.
+//        viewController.dismiss(animated: true, completion: nil)
+//
+//        print("Place name \(place.name)")
+//        print("Place address \(place.formattedAddress)")
+//        print("Place attributions \(place.attributions)")
+//    }
+//
+//    func placePickerDidCancel(_ viewController: GMSPlacePickerViewController) {
+//        // Dismiss the place picker, as it cannot dismiss itself.
+//        viewController.dismiss(animated: true, completion: nil)
+//
+//        print("No place selected")
+//    }
+//}
