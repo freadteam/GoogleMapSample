@@ -3,8 +3,7 @@
 ## GoogleMapのサンプルです。
 
 
-### 
-ViewController.swift
+### ViewController.swift
 サーバーに保存しないパターン
 地図の生成、マーカーの生成、マーカーの削除、検索
 
