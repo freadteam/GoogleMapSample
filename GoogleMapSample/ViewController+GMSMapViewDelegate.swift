@@ -10,9 +10,23 @@
  //viewDidLoadでdelegateの宣言をしておく
  extension ViewController: GMSMapViewDelegate{
     
+    //マーカーを打ち込む
+    func showMaker(position: CLLocationCoordinate2D, title: String) {
+        let marker = GMSMarker()
+        marker.position = position
+        marker.title = title
+        //marker.snippet = ""
+        //場所名が記入された時のみマーカーを生成
+        if marker.title?.count != 0 {
+            marker.appearAnimation = GMSMarkerAnimation.pop
+            //マーカーをmapviewに表示
+            marker.map = self.mapView
+        }
+    }
+    
     //長押しした場所の緯度経度をとる関数
     func mapView(_ mapView: GMSMapView, didLongPressAt coordinate: CLLocationCoordinate2D) {
-    
+        
         let alert = UIAlertController(title: "場所", message: "場所名を記入して", preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: "キャンセル", style: .default) { (action) in
             alert.dismiss(animated: true, completion: nil)
@@ -31,19 +45,6 @@
         }
         self.present(alert, animated: true, completion: nil)
         
-    }
-    
-    //マーカーを打ち込む
-    func showMaker(position: CLLocationCoordinate2D, title: String) {
-        let marker = GMSMarker()
-        marker.position = position
-        marker.title = title
-        //marker.snippet = ""
-        //場所名が記入された時のみマーカーを生成
-        if marker.title?.count != 0 {
-            //マーカーをmapviewに表示
-            marker.map = self.mapView
-        }
     }
     
     //マーカーのウィンドウを押した時の処理
@@ -78,7 +79,6 @@
         print("You tapped \(name): \(placeID), \(location.latitude)/\(location.longitude)")
     }
     
-
     
     //ピンを押した時に表示される情報ウィンドウを細かく設定できる
     //    func mapView(_ mapView: GMSMapView, markerInfoWindow marker: GMSMarker) -> UIView? {

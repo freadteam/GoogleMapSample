@@ -13,6 +13,7 @@ class Pin: NSObject {
     var latitude: CLLocationDegrees
     var longitude: CLLocationDegrees
     var title: String
+    
     init(latitude: CLLocationDegrees, longitude: CLLocationDegrees, title: String) {
         self.latitude = latitude
         self.longitude = longitude

@@ -49,7 +49,7 @@ extension ViewController: GMSAutocompleteViewControllerDelegate {
     //検索画面を表示させるボタン
     func makeSearchButton() {
         let button = UIButton()
-        button.frame = CGRect(x: 0, y: 0, width: 55, height: 55)
+        button.frame = CGRect(x: 311, y: 20, width: 55, height: 55)
         button.backgroundColor = UIColor.white
         button.setImage(UIImage(named: "search@2x.png"), for: .normal)
         button.layer.masksToBounds = true

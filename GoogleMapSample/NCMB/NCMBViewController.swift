@@ -4,7 +4,6 @@
 import UIKit
 import CoreLocation
 import GoogleMaps
-import GooglePlaces
 import NCMB
 
 class NCMBViewController: UIViewController {
@@ -14,7 +13,7 @@ class NCMBViewController: UIViewController {
     var locationManager = CLLocationManager()
     
     var pins = [Pin]()
-        
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         //GMSMapViewDelegate(extensionに記載)
@@ -27,12 +26,11 @@ class NCMBViewController: UIViewController {
         mapView.settings.myLocationButton = true
         
         makeMap()
+        loadLocations()
         makeSearchButton()
+        makeSaveButton()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        loadMarkerData()
-    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -53,45 +51,36 @@ class NCMBViewController: UIViewController {
             let camera = GMSCameraPosition.camera(withLatitude: 35.690167, longitude: 139.700359, zoom: 15.0)
             mapView.camera = camera
         }
+        
+        
     }
     
-    
-    //NCMBの保存
-    func saveMarker(latitude: CLLocationDegrees, longitude: CLLocationDegrees, title: String) {
-        let object = NCMBObject(className: "Place")
-        object?.setObject(latitude, forKey: "latitude")
-        object?.setObject(longitude, forKey: "longitude")
-        object?.setObject(title, forKey: "title")
-        object?.saveInBackground({ (error) in
-            if error != nil {
-                // SVProgressHUD.showError(withStatus: error!.localizedDescription)
-            } else {
-                print("登録成功")
-            }
-        })
-    }
-    
-    func loadMarkerData() {
+    func loadLocations() {
+        //全マーカーの削除
+//        mapView.clear()
+        
         let query = NCMBQuery(className: "Place")
-        // オブジェクトの取得
         query?.findObjectsInBackground({ (result, error) in
             if error != nil {
-                // SVProgressHUD.showError(withStatus: error!.localizedDescription)
+                print("error")
             } else {
-                for postObject in result as! [NCMBObject] {
-                    // 投稿の情報を取得
-                   // let objectId = postObject.object(forKey: "objectId") as! String
-                    let title = postObject.object(forKey: "title") as! String
-                    let latitude = postObject.object(forKey: "latitude") as! CLLocationDegrees
-                    let longitude = postObject.object(forKey: "longitude") as! CLLocationDegrees
-                    
-                   self.showMaker(position: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), title: title)
+                let places = result as! [NCMBObject]
+                for place in places {
+                    let longitude = place.object(forKey: "longitude") as! CLLocationDegrees
+                    let latitude = place.object(forKey: "latitude") as! CLLocationDegrees
+                    let name = place.object(forKey: "title") as! String
+                    let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                    //loadした情報からマーカーを生成
+                    let marker = GMSMarker()
+                    marker.position = location
+                    marker.title = name
+                    marker.map = self.mapView
                 }
             }
         })
     }
     
-
+    
     
 }
 

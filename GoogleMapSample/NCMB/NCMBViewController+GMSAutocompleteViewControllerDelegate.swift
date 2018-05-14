@@ -20,10 +20,15 @@ extension NCMBViewController: GMSAutocompleteViewControllerDelegate {
         let camera = GMSCameraPosition.camera(withLatitude: latitude, longitude: longitude, zoom: 15.0)
         mapView.camera = camera
         
+        //生成したpinを配列で保存する→保存ボタンでまとめてNCMBで保存
+        let pin = Pin(latitude: latitude, longitude: longitude, title: place.name)
+        self.pins.append(pin)
+
         //検索場所にマーカーを打つ（NCMBに保存しない）
         let marker = GMSMarker()
         marker.position = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        marker.title = title
+        marker.title = place.name
+        marker.appearAnimation = GMSMarkerAnimation.pop
         marker.map = mapView
         
         dismiss(animated: true, completion: nil)
@@ -51,12 +56,11 @@ extension NCMBViewController: GMSAutocompleteViewControllerDelegate {
     //検索画面を表示させるボタン
     func makeSearchButton() {
         let button = UIButton()
-        button.frame = CGRect(x: 0, y: 0, width: 55, height: 55)
+        button.frame = CGRect(x: 311, y: 20, width: 55, height: 55)
         button.backgroundColor = UIColor.white
         button.setImage(UIImage(named: "search@2x.png"), for: .normal)
         button.layer.masksToBounds = true
         button.layer.cornerRadius = button.frame.height/2
-        button.layer.position = CGPoint(x: 340, y: 50)
         self.mapView.addSubview(button)
         
         //ボタンに影をつける　なんかできない

@@ -7,8 +7,6 @@
 import UIKit
 import CoreLocation
 import GoogleMaps
-import GooglePlaces
-//import GooglePlacePicker
 
 class ViewController: UIViewController {
     //mapViewを表示させる
@@ -27,7 +25,7 @@ class ViewController: UIViewController {
         //現在地を取得するボタンをセット
         mapView.settings.myLocationButton = true
         
-        makeMap()
+        locateMyPosition()
         makeSearchButton()
     }
     
@@ -35,8 +33,8 @@ class ViewController: UIViewController {
         super.didReceiveMemoryWarning()
     }
     
-    //地図を生成、GMSCameraPositionで緯度経度を指定
-    func makeMap() {
+    //GMSCameraPositionで現在地の緯度経度を指定し、表示
+    func locateMyPosition() {
         // 現在地の緯度経度
         let latitude = locationManager.location?.coordinate.latitude
         let longitude = locationManager.location?.coordinate.longitude
