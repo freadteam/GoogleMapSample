@@ -13,7 +13,7 @@ class NCMBViewController: UIViewController {
     var locationManager = CLLocationManager()
     
     var pins = [Pin]()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         //GMSMapViewDelegate(extensionに記載)
@@ -56,9 +56,6 @@ class NCMBViewController: UIViewController {
     }
     
     func loadLocations() {
-        //全マーカーの削除
-//        mapView.clear()
-        
         let query = NCMBQuery(className: "Place")
         query?.findObjectsInBackground({ (result, error) in
             if error != nil {
@@ -71,15 +68,12 @@ class NCMBViewController: UIViewController {
                     let name = place.object(forKey: "title") as! String
                     let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
                     //loadした情報からマーカーを生成
-                    let marker = GMSMarker()
-                    marker.position = location
-                    marker.title = name
-                    marker.map = self.mapView
+                    self.showMaker(position: location, title: name)
                 }
             }
         })
     }
-    
+
     
     
 }
