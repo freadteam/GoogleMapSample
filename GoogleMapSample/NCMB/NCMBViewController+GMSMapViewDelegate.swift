@@ -64,10 +64,26 @@ extension NCMBViewController: GMSMapViewDelegate {
     //マーカーのウィンドウを長押した時の処理
     func mapView(_ mapView: GMSMapView, didLongPressInfoWindowOf marker: GMSMarker) {
         
+        guard pins.count != 0 else {
+            print("消せないよ")
+            return
+        }
+        
         let alert = UIAlertController(title: "ピンの削除", message: "ピンを削除しますか？", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default, handler: { (action) in
-            //マーカー除去
-            marker.map = nil
+            let latitude = marker.position.latitude
+            let longitude = marker.position.longitude
+            let name = marker.title
+           
+            
+            for pin in self.pins {
+                if pin.longitude == longitude && pin.latitude == latitude && pin.title == name {
+                    //マーカー除去
+                    marker.map = nil
+                    let index = self.pins.index(of: pin)
+                    self.pins.remove(at: index!)
+                }
+            }
         })
         
         
